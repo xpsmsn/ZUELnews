@@ -1,0 +1,69 @@
+<!--news-detail.wxml - 优化版-->
+<view class="container">
+  <!-- 新闻标题 -->
+  <view class="news-header" wx:if="{{news}}">
+    <view class="news-title">{{news.title}}</view>
+    <view class="news-meta">
+      <view class="news-date">📅 {{news.date}}</view>
+      <view class="news-source">{{news.source}}</view>
+    </view>
+  </view>
+  
+  <!-- 新闻链接区域 -->
+  <view class="news-link-section" wx:if="{{news && news.url}}">
+    <view class="link-label">🔗 链接</view>
+    <view class="link-content">{{news.url}}</view>
+    <button class="view-original-btn" bindtap="viewOriginal">查看原文</button>
+  </view>
+
+  <!-- 新闻正文 -->
+  <view class="news-content" wx:if="{{contentHtml.length > 0}}">
+    <view class="content-header">
+      <view class="content-title">📄 正文</view>
+      <view class="content-actions">
+        <view class="action-btn" bindtap="decreaseFont">
+          <text class="action-icon">➖</text>
+        </view>
+        <view class="action-btn" bindtap="increaseFont">
+          <text class="action-icon">➕</text>
+        </view>
+        <view class="action-btn favorite {{isFavorite ? 'active' : ''}}" bindtap="toggleFavorite">
+          <text class="action-icon">{{isFavorite ? '⭐' : '☆'}}</text>
+        </view>
+      </view>
+    </view>
+    
+    <view class="content-body">
+      <block wx:for="{{contentHtml}}" wx:key="index">
+        <view wx:if="{{item.type === 'text'}}" class="content-text" style="font-size: {{fontSize}}rpx; line-height: {{lineHeight}};">{{item.content}}</view>
+        <image wx:elif="{{item.type === 'image'}}" class="content-image" src="{{item.src}}" mode="widthFix" bindtap="previewImage" data-src="{{item.src}}"></image>
+        <view wx:elif="{{item.type === 'table'}}" class="content-table-wrapper">
+          <view class="content-table">
+            <view class="table-row" wx:for="{{item.data.rows}}" wx:for-index="rowIdx" wx:for-item="row" wx:key="rowIdx">
+              <view class="table-cell" wx:for="{{row}}" wx:for-index="cellIdx" wx:key="cellIdx">{{item}}</view>
+            </view>
+          </view>
+        </view>
+      </block>
+    </view>
+  </view>
+  
+  <!-- 加载状态 -->
+  <view class="loading" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">⏳ 加载中...</text>
+  </view>
+
+  <!-- 正文为空 -->
+  <view class="error-state" wx:if="{{!loading && news && contentHtml.length === 0}}">
+    <image class="error-image" src="https://lsky.vip.cpolar.cn/i/2026/02/20/6998505679a50.webp" mode="aspectFit"></image>
+    <text class="error-text">正文加载失败</text>
+    <text class="error-hint">可能因校内网络限制，请点击"查看原文"访问</text>
+    <button class="retry-btn" bindtap="fetchNewsContent">🔄 重试</button>
+  </view>
+  
+  <!-- 错误状态 -->
+  <view class="error-state" wx:if="{{!loading && !news}}">
+    <text class="error-text">❌ 新闻加载失败</text>
+  </view>
+</view>

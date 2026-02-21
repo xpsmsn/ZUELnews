@@ -1,0 +1,19 @@
+<!--web-view.wxml-->
+<view class="container">
+  <web-view 
+    id="web-view" 
+    src="{{url}}" 
+    bindload="onWebViewLoad"
+    binderror="onWebViewError"
+  ></web-view>
+  <!-- 加载提示 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+  <!-- 错误提示 -->
+  <view class="error" wx:if="{{error}}">
+    <text class="error-text">{{error}}</text>
+    <button class="btn" bindtap="reload">重新加载</button>
+    <button class="btn" bindtap="copyUrl">复制链接</button>
+  </view>
+</view>

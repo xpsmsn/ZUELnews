@@ -1,0 +1,26 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/news-detail/news-detail",
+    "pages/web-view/web-view"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "章鱼的高效助手",
+    "navigationBarTextStyle": "black"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "componentFramework": "glass-easel",
+  "lazyCodeLoading": "requiredComponents",
+  "componentPlaceholder": {
+    "van-button": "view"
+  },
+  "networkTimeout": {
+    "request": 30000,
+    "connectSocket": 30000,
+    "uploadFile": 30000,
+    "downloadFile": 30000
+  }
+}

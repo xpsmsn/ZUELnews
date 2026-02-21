@@ -1,0 +1,157 @@
+<!--index.wxml - 精致设计版-->
+<view class="container">
+  <!-- 顶部标题区域 -->
+  <view class="header-section {{hideHeader ? 'hide' : ''}}">
+    <view class="main-title">章鱼的高效助手</view>
+    <view class="subtitle">校园资讯，一手掌握</view>
+    <view class="decorative-line"></view>
+  </view>
+  
+  <!-- 新闻来源区域 -->
+  <view class="news-section card">
+    <view class="section-header">
+      <view class="section-title">
+        <view class="title-icon">📰</view>
+        <text>新闻来源</text>
+      </view>
+      <view class="update-time" wx:if="{{lastUpdateTime}}">
+        <text>🕐 {{lastUpdateTime}} 更新</text>
+      </view>
+    </view>
+    
+    <!-- 网站选择方框 -->
+    <view class="website-selector">
+      <view class="website-boxes">
+        <view class="website-box" 
+              wx:for="{{websites}}" 
+              wx:key="id" 
+              bindtap="selectWebsite" 
+              data-website="{{item}}" 
+              class="{{selectedWebsite && selectedWebsite.id === item.id ? 'selected' : ''}}">
+          <view class="box-icon">{{item.type === 'jwc' ? '🎓' : item.type === 'tw' ? '📢' : item.type === 'favorites' ? '⭐' : '📰'}}</view>
+          <view class="box-content">{{item.type === 'jwc' ? '本科生院' : item.type === 'tw' ? '校团委' : item.type === 'favorites' ? '我的收藏' : '文澜新闻'}}</view>
+          <view class="box-indicator" wx:if="{{selectedWebsite && selectedWebsite.id === item.id}}">✅</view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 搜索与筛选 -->
+    <view class="filter-bar" wx:if="{{!showFavorites}}">
+      <view class="filter-row-inline">
+        <view class="filter-item time-filter" bindtap="toggleDaysFilter">⏰ {{daysFilterOptions[daysFilterIndex]}}</view>
+        <view class="search-box-inline">
+          <input class="search-input" placeholder="🔍 搜索标题" bindinput="onSearchInput" value="{{searchQuery}}" />
+          <view class="clear-btn" wx:if="{{searchQuery}}" bindtap="clearSearch">✕</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 新闻内容区域 -->
+    <view class="news-content-wrapper">
+      <!-- 收藏列表 -->
+      <view class="news-container animate-in" wx:if="{{showFavorites && favoriteList.length > 0}}">
+        <view class="news-header">
+          <view class="news-count">
+            <view class="count-icon">⭐</view>
+            <text>{{favoriteList.length}} 条收藏</text>
+          </view>
+          <view class="news-header-actions">
+            <view class="font-adjust">
+              <view class="font-btn" bindtap="decreaseListFontSize">➖</view>
+              <view class="font-btn" bindtap="increaseListFontSize">➕</view>
+            </view>
+          </view>
+        </view>
+        <scroll-view scroll-y="true" class="news-scroll">
+          <view class="news-item compact" 
+                wx:for="{{favoriteList}}" 
+                wx:key="id" 
+                bindtap="viewNewsDetail" 
+                data-news="{{item}}">
+            <view class="news-content">
+              <view class="news-title" style="font-size: {{listFontSize}}rpx;">{{item.title}}</view>
+              <view class="news-meta">
+                <view class="news-source-badge">{{item.source}}</view>
+                <view class="news-date">{{item.date}}</view>
+              </view>
+            </view>
+            <view class="news-actions">
+              <view class="favorite-btn active" catchtap="toggleFavorite" data-news="{{item}}">⭐</view>
+              <view class="news-arrow">▶️</view>
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+
+      <!-- 收藏为空 -->
+      <view class="empty-state" wx:if="{{showFavorites && favoriteList.length === 0}}">
+        <view class="empty-icon-text">📭</view>
+        <view class="empty-text">暂无收藏内容</view>
+        <view class="empty-hint">在新闻详情页点击收藏按钮即可添加</view>
+      </view>
+
+      <!-- 新闻列表 -->
+      <view class="news-container animate-in" wx:if="{{!showFavorites && displayNewsList.length > 0 && !loading}}">
+        <view class="news-header">
+          <view class="news-count">
+            <view class="count-icon">📋</view>
+            <text>{{displayNewsList.length}} 条新闻</text>
+          </view>
+          <view class="news-header-actions">
+            <view class="font-adjust">
+              <view class="font-btn" bindtap="decreaseListFontSize">➖</view>
+              <view class="font-btn" bindtap="increaseListFontSize">➕</view>
+            </view>
+          </view>
+        </view>
+        <scroll-view scroll-y="true" class="news-scroll">
+          <view class="news-item compact {{item.isRead ? 'read' : ''}}" 
+                wx:for="{{displayNewsList}}" 
+                wx:key="id" 
+                bindtap="viewNewsDetail" 
+                data-news="{{item}}">
+            <view class="news-content">
+              <view class="news-title" style="font-size: {{listFontSize}}rpx;">{{item.title}}</view>
+              <view class="news-meta">
+                <view class="news-source-badge">{{item.source}}</view>
+                <view class="news-date">{{item.date}}</view>
+                <view class="news-read-badge" wx:if="{{item.isRead}}">✅ 已读</view>
+              </view>
+            </view>
+            <view class="news-actions">
+              <view class="favorite-btn {{item.isFavorite ? 'active' : ''}}" catchtap="toggleFavorite" data-news="{{item}}">
+                {{item.isFavorite ? '⭐' : '☆'}}
+              </view>
+              <view class="news-arrow">▶️</view>
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+
+      <!-- 加载遮罩层 -->
+      <view class="loading-overlay" wx:if="{{loading}}">
+        <view class="loading-spinner"></view>
+        <text class="loading-text">⏳ 加载中...</text>
+      </view>
+
+      <!-- 错误状态 -->
+      <view class="error-state" wx:if="{{!loading && errorMessage}}">
+        <image class="error-image" src="https://lsky.vip.cpolar.cn/i/2026/02/20/6998505679a50.webp" mode="aspectFit"></image>
+        <view class="error-text">❌ {{errorMessage}}</view>
+        <button class="retry-btn" bindtap="retryFetch">🔄 重试</button>
+      </view>
+      
+      <!-- 空状态 -->
+      <view class="empty-state" wx:if="{{!showFavorites && !loading && !errorMessage && displayNewsList.length === 0}}">
+        <image class="empty-icon" src="https://lsky.vip.cpolar.cn/i/2026/02/20/699853810c9f4.webp" mode="aspectFit"></image>
+        <view class="empty-text">{{selectedWebsite ? '未获取到符合条件的新闻' : '👆 点击上方网站获取新闻'}}</view>
+        <button class="retry-btn" wx:if="{{selectedWebsite}}" bindtap="retryFetch">🔄 重新获取</button>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 页脚 -->
+  <view class="footer">
+    <text>章鱼的高效助手 © 2026</text>
+  </view>
+</view>
