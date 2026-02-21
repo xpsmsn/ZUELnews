@@ -33,7 +33,6 @@ Page({
     errorMessage: '',
     selectedWebsite: null,
     searchQuery: '',
-    viewMode: 'compact',
     daysFilterOptions: ['近7天', '不限'],
     daysFilterIndex: 0,
     daysFilter: 7,
@@ -71,16 +70,6 @@ Page({
       listFontSize,
       lastUpdateTime
     });
-  },
-
-  checkAutoRefresh() {
-    const lastTime = wx.getStorageSync('lastRefreshTimestamp') || 0;
-    const now = Date.now();
-    const tenMinutes = 10 * 60 * 1000;
-    
-    if (now - lastTime > tenMinutes) {
-      this.silentRefreshAll();
-    }
   },
 
   silentRefreshAll() {
@@ -126,32 +115,6 @@ Page({
 
     wx.setStorageSync('lastUpdateTime', updateTime);
     wx.setStorageSync('lastRefreshTimestamp', Date.now());
-  },
-
-  autoRefreshAll() {
-    if (this.data.isRefreshing) return;
-    
-    this.setData({
-      isRefreshing: true,
-      loading: true,
-      hideHeader: true
-    });
-
-    const newsSources = this.data.websites.filter(w => w.type !== 'favorites');
-    let allNews = [];
-    let completedCount = 0;
-    const totalCount = newsSources.length;
-
-    newsSources.forEach(website => {
-      this.fetchNewsSilent(website, (newsList) => {
-        allNews = allNews.concat(newsList);
-        completedCount++;
-
-        if (completedCount === totalCount) {
-          this.processAllNews(allNews);
-        }
-      });
-    });
   },
 
   fetchNewsSilent(website, callback) {
@@ -714,45 +677,6 @@ Page({
     } else {
       return baseUrl + '/' + href;
     }
-  },
-  
-  // 按日期过滤新闻
-  filterNewsByDays(newsList, days) {
-    if (!newsList || newsList.length === 0) {
-      return [];
-    }
-    
-    // 确保所有新闻项都有dateObj
-    const newsWithDate = newsList.map(item => {
-      if (!item.dateObj) {
-        // 解析日期字符串
-        const dateObj = this.parseDate(item.date);
-        return {
-          ...item,
-          dateObj: dateObj
-        };
-      }
-      return item;
-    });
-    
-    // 过滤掉没有有效日期的新闻
-    const validNews = newsWithDate.filter(item => item.dateObj instanceof Date && !isNaN(item.dateObj.getTime()));
-    
-    // 计算截止日期
-    const cutoffDate = new Date();
-    cutoffDate.setDate(cutoffDate.getDate() - days);
-    cutoffDate.setHours(0, 0, 0, 0);
-    
-    // 过滤最近N天的新闻
-    const recentNews = validNews.filter(item => item.dateObj >= cutoffDate);
-    
-    // 如果最近N天内的新闻不足，扩大搜索范围
-    if (recentNews.length < 3) {
-      // 按日期排序，取最近的10条
-      return validNews.sort((a, b) => new Date(b.dateObj) - new Date(a.dateObj)).slice(0, 10);
-    }
-    
-    return recentNews;
   },
   
   // 解析日期字符串为Date对象

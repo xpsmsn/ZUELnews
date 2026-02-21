@@ -276,17 +276,6 @@
   }
 }
 
-@keyframes slideOutDown {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(20rpx);
-  }
-}
-
 @keyframes fadeInOnly {
   from {
     opacity: 0;
@@ -602,11 +591,6 @@
   font-weight: 600;
 }
 
-.view-mode {
-  color: #667eea;
-  font-weight: 600;
-}
-
 .empty-icon-text {
   font-size: 120rpx;
   margin-bottom: 24rpx;
@@ -643,10 +627,6 @@
 .news-item.compact .news-source-badge {
   font-size: 20rpx;
   padding: 4rpx 12rpx;
-}
-
-.news-item.comfortable {
-  padding: 28rpx 24rpx;
 }
 
 .news-actions {

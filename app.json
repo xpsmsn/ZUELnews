@@ -14,9 +14,6 @@
   "sitemapLocation": "sitemap.json",
   "componentFramework": "glass-easel",
   "lazyCodeLoading": "requiredComponents",
-  "componentPlaceholder": {
-    "van-button": "view"
-  },
   "networkTimeout": {
     "request": 30000,
     "connectSocket": 30000,

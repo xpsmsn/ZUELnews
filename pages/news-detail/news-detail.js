@@ -641,12 +641,6 @@ Page({
     return normalized;
   },
 
-  normalizeNumberSpacing(text) {
-    return text
-      .replace(/(\d)\s+(\d)/g, '$1$2')
-      .replace(/(\d)\s*[-–—]\s*(\d)/g, '$1-$2');
-  },
-
   cleanFooterContent(text) {
     if (!text) return text;
 
